@@ -6,7 +6,6 @@ import NotePageNav from '../NotePageNav/NotePageNav';
 import NoteListMain from '../NoteListMain/NoteListMain';
 import NotePageMain from '../NotePageMain/NotePageMain';
 import NotePageMainContext from '../NotePageMainContext';
-import dummyStore from '../dummy-store';
 import './App.css';
 
 class App extends Component {
@@ -16,8 +15,35 @@ class App extends Component {
     };
 
     componentDidMount() {
-        // fake date loading from API call
-        setTimeout(() => this.setState(dummyStore), 600);
+      Promise.all([
+        fetch('http://localhost:9090/folders'),
+        fetch('http://localhost:9090/notes')
+      ]).then(([foldersResults, notesResults]) => {
+        if(!foldersResults.ok) {
+          return Promise.reject()
+        }
+        if(!notesResults.ok) {
+          return Promise.reject()
+        }
+        return Promise.all([foldersResults.json(), notesResults.json()])
+      })
+        .then(([folders, notes]) => {
+          this.setState({notes, folders})
+        })
+    }
+
+    handleDeleteNote = (noteId) => {
+      fetch(`http://localhost:1234/foo/${noteId}`, {
+        method: 'DELETE',
+        headers: {
+          'content-type': 'application/json'
+        },
+      })
+      .then (
+        this.setState({
+          notes: this.state.notes.filter(note => note.id !== noteId)
+        })
+      )
     }
 
     renderNavRoutes() {
@@ -58,7 +84,8 @@ class App extends Component {
         return (
             <NotePageMainContext.Provider value={{
                 notes: this.state.notes,
-                folders: this.state.folders
+                folders: this.state.folders,
+                deleteNote: this.handleDeleteNote
             }}>
               <div className="App">
                   <nav className="App__nav">{this.renderNavRoutes()}</nav>

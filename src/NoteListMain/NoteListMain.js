@@ -20,7 +20,6 @@ export default class NoteListMain extends Component {
     const { notes } = this.context;
     const {folderId} = this.props.match.params;
     const notesForFolder = getNotesForFolder(notes, folderId);
-
     return (
         <section className='NoteListMain'>
           <ul>
@@ -30,6 +29,7 @@ export default class NoteListMain extends Component {
                   id={note.id}
                   name={note.name}
                   modified={note.modified}
+                  onDeleteNote={this.handleDeleteNote}
                 />
               </li>
             )}
