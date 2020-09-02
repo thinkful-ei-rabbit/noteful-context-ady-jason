@@ -9,6 +9,12 @@ import { render } from 'enzyme'
 export default class NotePageNav extends Component {
   static contextType = NotePageMainContext;
 
+  static defaultProps = {
+    match: {
+      params: {}
+    }
+  }
+
   render() {
     const { folders, notes } = this.context;
     const { noteId } = this.props.match.params;
@@ -19,7 +25,7 @@ export default class NotePageNav extends Component {
           <CircleButton
             tag='button'
             role='link'
-            onClick={() => this.context.history.goBack()}
+            onClick={() => this.props.history.goBack()}
             className='NotePageNav__back-button'
           >
             <FontAwesomeIcon icon='chevron-left' />
